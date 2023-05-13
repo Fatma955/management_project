@@ -17,4 +17,21 @@ Public Class Form2
         ' Bind the DataGridView control to the DataSet
         DataGridView1.DataSource = dataSet.Tables("Categories")
     End Sub
+
+    Private Sub btn_search_Click(sender As Object, e As EventArgs) Handles btn_search.Click
+        Dim searchTerm As String = txt_search.Text.Trim()
+        Dim dataTable As DataTable = CType(DataGridView1.DataSource, DataTable)
+        dataTable.DefaultView.RowFilter = $"CategoryType LIKE '%{searchTerm}%'"
+        DataGridView1.Refresh()
+    End Sub
+
+    'Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
+    '    Dim dataTable As DataTable = CType(DataGridView1.DataSource, DataTable)
+    '    dataTable.DefaultView.RowFilter = ""
+    '    DataGridView1.Refresh()
+    '    txt_search.Text = ""
+    '    Txt_type.Text = ""
+    '    Txt_price.Text = ""
+    '    Txt_expired.Text = ""
+    'End Sub
 End Class

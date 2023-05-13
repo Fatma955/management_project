@@ -1,13 +1,10 @@
 ﻿Imports System.Data.SqlClient
 Imports System.Data
-Imports System.Windows.Forms.VisualStyles.VisualStyleElement
-
-Public Class Form3
+Public Class Form4
     Dim connectionString As String = "Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\fox code1\Desktop\New folder (3)\WinFormsApp1\WinFormsApp1\app_data\Database1.mdf;Integrated Security=True"
-    Dim sqlQuery As String = "SELECT * FROM Categories"
+    Dim sqlQuery As String = "SELECT * FROM [dbo].[Table]"
 
-    Private Sub Form3_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-
+    Private Sub Form4_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         ' Create connection and data adapter objects
         Dim connection As New SqlConnection(connectionString)
         Dim dataAdapter As New SqlDataAdapter(sqlQuery, connection)
@@ -15,35 +12,36 @@ Public Class Form3
         Dim dataSet As New DataSet()
 
         ' Fill the DataSet with data from the data adapter
-        dataAdapter.Fill(dataSet, "Categories")
+        dataAdapter.Fill(dataSet, "[dbo].[Table]")
 
         ' Bind the DataGridView control to the DataSet
-        DataGridView1.DataSource = dataSet.Tables("Categories")
-
+        DataGridView1.DataSource = dataSet.Tables("[dbo].[Table]")
     End Sub
-    Dim tableName As String = "Categories"
+
     Private Sub btn_add_Click(sender As Object, e As EventArgs) Handles btn_add.Click
 
         Dim primaryKeyField As String = "ID"
-        Dim insertQuery As String = "INSERT INTO " & tableName & " (CategoryType, Price, ExpiredDate) VALUES (@Type, @Price, @ExpiredDate)"
+        Dim insertQuery As String = "INSERT INTO [dbo].[Table] (UserName, Email, Password, LevelNum) VALUES (@UserName, @Email, @Password, @LevelNum)"
 
         Using connection As New SqlConnection(connectionString),
           command As New SqlCommand(insertQuery, connection)
             ' Set the parameter values for the new record
-            command.Parameters.AddWithValue("@Type", Txt_type.Text.Trim())
-            command.Parameters.AddWithValue("@Price", SqlDbType.Int).Value = Integer.Parse(Txt_price.Text.Trim())
-            command.Parameters.AddWithValue("@ExpiredDate", Txt_expired.Text.Trim())
-            ' Open the database connection and execute the insert query
+            command.Parameters.AddWithValue("@UserName", Txt_name.Text.Trim())
+            command.Parameters.AddWithValue("@Email", Txt_email.Text.Trim())
+            command.Parameters.AddWithValue("@Password", Txt_pass.Text.Trim())
+            command.Parameters.AddWithValue("@LevelNum", SqlDbType.Int).Value = Integer.Parse(txt_level.Text.Trim())
             connection.Open()
             command.ExecuteNonQuery()
-            Txt_type.Text = ""
-            Txt_price.Text = ""
-            Txt_expired.Text = ""
+            Txt_name.Text = ""
+            Txt_email.Text = ""
+            Txt_pass.Text = ""
+            txt_level.Text = ""
 
             ' Refresh the DataGridView to show the newly added item
-            Form3_Load(sender, e)
+            Form4_Load(sender, e)
         End Using
     End Sub
+
     Private selectedID As Integer
 
     Private Sub DataGridView1_CellClick(sender As Object, e As DataGridViewCellEventArgs) Handles DataGridView1.CellClick
@@ -52,9 +50,10 @@ Public Class Form3
 
         ' Store the ID of the selected row in a variable for later use
         selectedID = Convert.ToInt32(selectedRow.Cells("id").Value)
-        Txt_type.Text = selectedRow.Cells("CategoryType").Value.ToString()
-        Txt_price.Text = selectedRow.Cells("price").Value.ToString()
-        Txt_expired.Text = selectedRow.Cells("ExpiredDate").Value.ToString()
+        Txt_name.Text = selectedRow.Cells("UserName").Value.ToString()
+        Txt_email.Text = selectedRow.Cells("Email").Value.ToString()
+        Txt_pass.Text = selectedRow.Cells("Password").Value.ToString()
+        txt_level.Text = selectedRow.Cells("LevelNum").Value.ToString()
 
         ' Define the primary key of the DataTable (if not already defined)
         Dim dataTable As DataTable = CType(DataGridView1.DataSource, DataTable)
@@ -62,22 +61,22 @@ Public Class Form3
             dataTable.PrimaryKey = New DataColumn() {dataTable.Columns("id")}
         End If
     End Sub
-
     Private Sub btn_update_Click(sender As Object, e As EventArgs) Handles btn_update.Click
         Dim dataTable As DataTable = CType(DataGridView1.DataSource, DataTable)
 
         ' Locate the row that you want to update using a loop
         For Each row As DataRow In dataTable.Rows
             If Convert.ToInt32(row("id")) = selectedID Then
-                row("CategoryType") = Txt_type.Text
-                row("price") = Txt_price.Text
-                row("ExpiredDate") = Txt_expired.Text
+                row("UserName") = Txt_name.Text
+                row("Email") = Txt_email.Text
+                row("Password") = Txt_pass.Text
+                row("LevelNum") = txt_level.Text
                 Exit For
             End If
         Next
 
         ' Update the database with the changes
-        Dim adapter As New SqlDataAdapter("SELECT * FROM Categories", connectionString)
+        Dim adapter As New SqlDataAdapter("SELECT * FROM [dbo].[Table]", connectionString)
         Dim builder As New SqlCommandBuilder(adapter)
         adapter.Update(dataTable)
 
@@ -113,19 +112,11 @@ Public Class Form3
         End If
     End Sub
 
-
-
     Private Sub btn_search_Click(sender As Object, e As EventArgs) Handles btn_search.Click
         Dim searchTerm As String = txt_search.Text.Trim()
         Dim dataTable As DataTable = CType(DataGridView1.DataSource, DataTable)
-        dataTable.DefaultView.RowFilter = $"CategoryType LIKE '%{searchTerm}%'"
+        dataTable.DefaultView.RowFilter = $"UserName LIKE '%{searchTerm}%'"
         DataGridView1.Refresh()
-    End Sub
-
-    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
-        Dim nextPage As New Form4()
-        nextPage.Show()
-        Me.Hide()
     End Sub
 
     Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
@@ -133,39 +124,16 @@ Public Class Form3
         dataTable.DefaultView.RowFilter = ""
         DataGridView1.Refresh()
         txt_search.Text = ""
-        Txt_type.Text = ""
-        Txt_price.Text = ""
-        Txt_expired.Text = ""
-    End Sub
+        Txt_name.Text = ""
+        Txt_email.Text = ""
+        Txt_pass.Text = ""
+        txt_level.Text = ""
 
-    Private Sub Button3_Click(sender As Object, e As EventArgs) Handles Button3.Click
-        Dim query As String = "SELECT * FROM Categories WHERE ExpiredDate < GETDATE()"
-
-        Using connection As New SqlConnection(connectionString)
-            Using command As New SqlCommand(query, connection)
-                Try
-                    connection.Open()
-                    Dim adapter As New SqlDataAdapter(command)
-                    Dim dataTable As New DataTable()
-                    adapter.Fill(dataTable)
-
-                    If dataTable.Rows.Count > 0 Then
-
-                        DataGridView1.DataSource = dataTable
-                        MessageBox.Show("توجد منتجات منتهية الصلاحية:")
-                    Else
-                        MessageBox.Show("لا توجد منتجات منتهية الصلاحية")
-                    End If
-                Catch ex As Exception
-                    MessageBox.Show("حدث خطأ أثناء الاتصال بقاعدة البيانات")
-                End Try
-            End Using
-        End Using
     End Sub
 
     Private Sub Button4_Click(sender As Object, e As EventArgs) Handles Button4.Click
-        Dim form1 As New Form1 ' اسم النافذة السابقة هنا Form1
+        Dim form3 As New Form3 ' اسم النافذة السابقة هنا Form1
         Me.Hide()
-        form1.Show()
+        form3.Show()
     End Sub
 End Class

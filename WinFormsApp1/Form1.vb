@@ -7,18 +7,7 @@ Public Class Form1
     'Dim sqlQuery As String = "SELECT * FROM [dbo].[Table]"
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        '' Create connection and data adapter objects
-        'Dim connection As New SqlConnection(connectionString)
-        'Dim dataAdapter As New SqlDataAdapter(sqlQuery, connection)
 
-        '' Create a new DataSet object to hold the retrieved data
-        'Dim dataSet As New DataSet()
-
-        '' Fill the DataSet with data from the data adapter
-        'dataAdapter.Fill(dataSet, "[dbo].[Table]")
-
-        '' Bind the DataGridView control to the DataSet
-        'DataGridView1.DataSource = dataSet.Tables("[dbo].[Table]")
     End Sub
 
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
